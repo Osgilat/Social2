@@ -55,48 +55,20 @@ public class PlayerActor : NetworkBehaviour
         {
             return;
         }
-
-        PlayerInfo.UIManager.ResetUI(PlayerInfo.UIManager.askButton);
-
+        
         if (!sayHelpMe)
         {
             sayHelpMe = true;
-            PlayerInfo.UIManager.askButton.GetComponent<Image>().color = Color.clear;
             
 
         }
         else
         {
             sayHelpMe = false;
-            PlayerInfo.UIManager.askButton.GetComponent<Image>().color = Color.white;
         }
 
     }
 
-    //Used to control button's behavior
-    public void OnThankClick()
-    {
-
-        if (!GetComponent<PlayerInfo>().IsTrueLocalPlayer())
-        {
-            return;
-        }
-
-        PlayerInfo.UIManager.ResetUI(PlayerInfo.UIManager.thankButton);
-        
-        if (!sayThank)
-        {
-            sayThank = true;
-            PlayerInfo.UIManager.thankButton.GetComponent<Image>().color = Color.clear;
-            
-        }
-        else
-        {
-            sayThank = false;
-            PlayerInfo.UIManager.thankButton.GetComponent<Image>().color = Color.white;
-        }
-        
-    }
 
     //Clicked place
     public RaycastHit hit;
@@ -105,29 +77,6 @@ public class PlayerActor : NetworkBehaviour
     void FixedUpdate()
     {
         //Control only by local player
-
-        if (!GetComponent<PlayerInfo>().IsTrueLocalPlayer() )
-        {
-            return;
-        }
-
-        if (sayHelpMe)
-        {
-            gameObject.GetComponent<PlayerSkills>().askTrigger = true;
-        }
-        else
-        {
-            gameObject.GetComponent<PlayerSkills>().askTrigger = false;
-        }
-
-        if (sayThank)
-        {
-            gameObject.GetComponent<PlayerSkills>().thankTrigger = true;
-        }
-        else
-        {
-            gameObject.GetComponent<PlayerSkills>().thankTrigger = false;
-        }
 
         if (Input.GetMouseButtonUp(0))
         {
@@ -350,73 +299,8 @@ public class PlayerActor : NetworkBehaviour
 	//Used by AI to greet other players
 	public void AI_Ask(GameObject ai_target){
         SaySomething(ai_target, true);
-        /*
-		Transform player = ai_target.transform;
-		Vector3 targetDir = player.position - this.transform.position;
-		float step = rotationSpeed * Time.deltaTime;
-
-		Vector3 newDir = Vector3.RotateTowards (transform.forward, targetDir, step, 0.0F);
-		
-		transform.rotation = Quaternion.LookRotation (newDir);
-
-		animator.SetTrigger("SayHello");
-        CmdFlickerLight("ASK");
-
-        if (player.name == "PlayerMod_A(Clone)" && this.name != "PlayerMod_A(Clone)") {
-           
-
-            audioSync.PlaySound (0);
-            
-        } else if (player.name == "PlayerMod_B(Clone)" && this.name != "PlayerMod_B(Clone)") {
-			audioSync.PlaySound (1);
-            
-        } else if (player.name == "PlayerMod_C(Clone)" && this.name != "PlayerMod_C(Clone)") {
-			audioSync.PlaySound (2);
-            
-        }
-
-        Logger.LogAction("Ask", gameObject, ai_target);
-        Cmd_Hello(this.gameObject, ai_target);
-        sayHelpMe = false;
-        */
-
+     
 	}
 
-    public void AI_Thank(GameObject ai_target)
-    {
-        SaySomething(ai_target, false);
-        /*
-        Transform player = ai_target.transform;
-        Vector3 targetDir = player.position - this.transform.position;
-        float step = rotationSpeed * Time.deltaTime;
-
-        Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
-        transform.rotation = Quaternion.LookRotation(newDir);
-
-        animator.SetTrigger("SayHello");
-        CmdFlickerLight("THANK");
-
-        if (player.name == "PlayerMod_A(Clone)" && this.name != "PlayerMod_A(Clone)")
-        {
-            audioSync.PlaySound(8);
-            
-        }
-        else if (player.name == "PlayerMod_B(Clone)" && this.name != "PlayerMod_B(Clone)")
-        {
-            audioSync.PlaySound(9);
-
-        }
-        else if (player.name == "PlayerMod_C(Clone)" && this.name != "PlayerMod_C(Clone)")
-        {
-            audioSync.PlaySound(10);
-
-        }
-
-        Logger.LogAction("Thank", gameObject, ai_target);
-        Cmd_Hello(this.gameObject, ai_target);
-        sayHelpMe = false;
-        */
-
-    }
 
 }

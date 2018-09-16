@@ -171,9 +171,6 @@ public class Logger : MonoBehaviour
                 }
             }
 
-
-            //Notify bots about action
-            BotsNotifier.Notify(action, actor, target);
         }
 
     }

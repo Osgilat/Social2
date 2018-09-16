@@ -19,8 +19,8 @@ public class SceneInfo : NetworkBehaviour {
 
             switch (sceneName)
             {
-                case "Teleports":
-                    sessionID = "TP" + sessionID;
+                case "NewGame":
+                    sessionID = "NG" + sessionID;
                     break;
 			case "TeleportsML":
 				sessionID = "TPML" + sessionID;

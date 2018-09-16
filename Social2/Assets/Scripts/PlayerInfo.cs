@@ -11,7 +11,6 @@ public class PlayerInfo : NetworkBehaviour
     public static GameObject localPlayerGameObject;
     public Material localPlayerMaterial;
     public GameObject objectToPaint;
-    public static UIManager UIManager;
 
     public GameObject playerToTarget1 = null;
     public GameObject playerToTarget2 = null;
@@ -30,7 +29,6 @@ public class PlayerInfo : NetworkBehaviour
 
         localPlayerGameObject = gameObject;
 
-        Invoke("SearchForOtherPlayers", 2f);
     }
 
     public override void OnStartLocalPlayer()
@@ -43,35 +41,13 @@ public class PlayerInfo : NetworkBehaviour
     {
         
         if (gameObject.GetComponent<Text>().text !=
-            localPlayerGameObject.GetComponent<Text>().text
-            || gameObject.GetComponent<AI_behaviour>().enabled)
+            localPlayerGameObject.GetComponent<Text>().text)
         {
             return false;
         }
         else
         {
             return true;
-        }
-    }
-
-    void SearchForOtherPlayers()
-    {
-        UIManager = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
-
-        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
-        {
-            if (player != gameObject)
-            {
-                if (playerToTarget1 == null)
-                {
-                    playerToTarget1 = player;
-                }
-
-                if (playerToTarget1 != null)
-                {
-                    playerToTarget2 = player;
-                }
-            }
         }
     }
 

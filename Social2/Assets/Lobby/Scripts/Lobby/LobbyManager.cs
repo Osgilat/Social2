@@ -55,36 +55,7 @@ namespace Prototype.NetworkLobby
             GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 
             GameObject localPlayer = null;
-            if (players.Length == 0)
-            {
-                for (int i = 0; i < aiCount; i++)
-                {
-                    int randCharIndex = Random.Range(0, meshes.Count);
-
-                    //Used for a ai representation
-                    GameObject aiPlayer = null;
-
-                    Transform spawn = NetworkManager.singleton.GetStartPosition();
-
-                    aiPlayer = Instantiate(meshes[randCharIndex], spawn.position, spawn.rotation) as GameObject;
-                    aiPlayer.GetComponent<AI_behaviour>().enabled = true;
-                    aiPlayer.GetComponent<AI_behaviour>().useMoralScheme = true;
-                    meshes.RemoveAt(randCharIndex);
-
-                    NetworkServer.Spawn(aiPlayer);
-                }
-
-
-                if (selectedScene == "PASSENGERS")
-                {
-                    //Damaged ai behavior
-                    GameObject aiPlayer = null;
-                    aiPlayer = Instantiate(playerDamaged, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
-                    aiPlayer.GetComponent<DamagedBotBehavior>().enabled = true;
-                    NetworkServer.Spawn(aiPlayer);
-                }
-
-            }
+          
              
 
             
@@ -99,11 +70,6 @@ namespace Prototype.NetworkLobby
                 localPlayer = Instantiate(meshes[randCharIndex], spawn.position, spawn.rotation) as GameObject;
 
                // Debug.Log("Created player of " + randCharIndex);
-
-                if (realPlayers == 0)
-                {
-                    localPlayer.GetComponent<AI_behaviour>().enabled = true;
-                }
 
                 meshes.RemoveAt(randCharIndex);
 
