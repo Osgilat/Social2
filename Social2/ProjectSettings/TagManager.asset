@@ -40,6 +40,7 @@ TagManager:
   - SphereEffect
   - FixZone2
   - FixZone1
+  - Enemy
   layers:
   - Default
   - TransparentFX

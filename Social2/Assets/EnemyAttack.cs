@@ -15,6 +15,14 @@ public class EnemyAttack : MonoBehaviour
         _animator = GetComponent<Animator>();
     }
 
+    public void DissolveGhost()
+    {
+        if (!GetComponent<Health>().canHarmPlayer)
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject == _player)
@@ -27,6 +35,15 @@ public class EnemyAttack : MonoBehaviour
     void OnTriggerExit(Collider other)
     {
         if (other.gameObject == _player)
+        {
+            isNearPlayer = false;
+            _animator.SetBool("IsNearPlayer", false);
+        }
+    }
+
+    private void Update()
+    {
+        if(_player != null && _player.GetComponent<Health>().healthPoints == 0)
         {
             isNearPlayer = false;
             _animator.SetBool("IsNearPlayer", false);
