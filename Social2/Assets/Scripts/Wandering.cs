@@ -12,15 +12,27 @@ public class Wandering : MonoBehaviour {
 	private NavMeshAgent agent;
 	private float timer;
 
-	// Use this for initialization
-	void OnEnable () {
+
+    public Animator anim;
+    // Use this for initialization
+    void OnEnable () {
 		agent = GetComponent<NavMeshAgent> ();
-		timer = wanderTimer;
+
+        anim = GetComponent<Animator>();
+        timer = wanderTimer;
 	}
 
-	// Update is called once per frame
-	void Update () {
-		timer += Time.deltaTime;
+    public float agentVelocity;
+
+    // Update is called once per frame
+    void Update () {
+        if (agent.velocity.magnitude >= 0)
+        {
+            agentVelocity = agent.velocity.magnitude;
+            anim.SetFloat("Forward", agent.velocity.magnitude);
+        }
+
+        timer += Time.deltaTime;
 
 		if (timer >= wanderTimer) {
 			Vector3 newPos = RandomNavSphere(transform.position, wanderRadius, -1);

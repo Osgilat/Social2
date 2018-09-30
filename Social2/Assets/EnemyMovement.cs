@@ -54,7 +54,7 @@ public class EnemyMovement : MonoBehaviour
                 // we hit SOMETHING, not necessarily a player
                 if (!(hitInfo.collider.gameObject.tag == "Player"))
                 {
-                    Debug.Log("Cant see player " + hitInfo.collider.gameObject.name);
+                    //Debug.Log("Cant see player " + hitInfo.collider.gameObject.name);
                     return;
 
                 }
