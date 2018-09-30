@@ -5,13 +5,13 @@ using System.Collections;
 public class EnemyAttack : MonoBehaviour
 {
     Animator _animator;
-    GameObject _player;
+    public GameObject player;
 
     public bool isNearPlayer = false;
 
     void Awake()
     {
-        _player = GameObject.FindGameObjectWithTag("Player");
+        //_player = GameObject.FindGameObjectWithTag("Player");
         _animator = GetComponent<Animator>();
     }
 
@@ -25,8 +25,10 @@ public class EnemyAttack : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == _player)
+
+        if (other.gameObject.GetComponent<Aspect>().aspectType == Aspect.AspectTypes.PLAYER)
         {
+            player = other.gameObject;
             isNearPlayer = true;
             _animator.SetBool("IsNearPlayer", true);
         }
@@ -34,7 +36,7 @@ public class EnemyAttack : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        if (other.gameObject == _player)
+        if (other.gameObject.GetComponent<Aspect>().aspectType == Aspect.AspectTypes.PLAYER)
         {
             isNearPlayer = false;
             _animator.SetBool("IsNearPlayer", false);
@@ -43,7 +45,7 @@ public class EnemyAttack : MonoBehaviour
 
     private void Update()
     {
-        if(_player != null && _player.GetComponent<Health>().healthPoints == 0)
+        if(player != null && player.GetComponent<Health>().healthPoints == 0)
         {
             isNearPlayer = false;
             _animator.SetBool("IsNearPlayer", false);
