@@ -7,22 +7,18 @@ public class Wandering : MonoBehaviour {
 
 	public float wanderRadius;
 	public float wanderTimer;
-
 	private Transform target;
 	private NavMeshAgent agent;
 	private float timer;
-
-
     public Animator anim;
+    public float agentVelocity;
+
     // Use this for initialization
     void OnEnable () {
 		agent = GetComponent<NavMeshAgent> ();
-
         anim = GetComponent<Animator>();
         timer = wanderTimer;
 	}
-
-    public float agentVelocity;
 
     // Update is called once per frame
     void Update () {
@@ -34,11 +30,12 @@ public class Wandering : MonoBehaviour {
 
         timer += Time.deltaTime;
 
-		if (timer >= wanderTimer) {
-			Vector3 newPos = RandomNavSphere(transform.position, wanderRadius, -1);
-			agent.SetDestination(newPos);
-			timer = 0;
-		}
+        if (timer >= wanderTimer)
+        {
+            Vector3 newPos = RandomNavSphere(transform.position, wanderRadius, -1);
+            agent.SetDestination(newPos);
+            timer = 0;
+        }
 	}
 
 	public static Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask) {
@@ -52,4 +49,24 @@ public class Wandering : MonoBehaviour {
 
 		return navHit.position;
 	}
+
+    /*public GameObject FindClosestAlifeEnemy()
+    {
+        GameObject[] gos;
+        gos = GameObject.FindGameObjectsWithTag("Enemy");
+        GameObject closest = null;
+        float distance = Mathf.Infinity;
+        Vector3 position = transform.position;
+        foreach (GameObject go in gos)
+        {
+            Vector3 diff = go.transform.position - position;
+            float curDistance = diff.sqrMagnitude;
+            if (curDistance < distance && go.GetComponent<Health>().healthPoints > 0)
+            {
+                closest = go;
+                distance = curDistance;
+            }
+        }
+        return closest;
+    }*/
 }

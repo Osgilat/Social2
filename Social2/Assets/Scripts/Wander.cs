@@ -43,6 +43,7 @@ public class Wander : MonoBehaviour {
 
     void Update()
     {
+        /*
         if (agent.velocity.magnitude >= 0)
         {
             agentVelocity = agent.velocity.magnitude;
@@ -59,8 +60,8 @@ public class Wander : MonoBehaviour {
 
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation,
             rotationSpeed * Time.deltaTime);
-            */
+            /
         agent.SetDestination(targetPosition);
-        
+        */
     }
 }

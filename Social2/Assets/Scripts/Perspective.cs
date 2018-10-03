@@ -5,8 +5,9 @@ using UnityEngine;
 public class Perspective : Sense
 {
     public GameObject closestObject;
-
     public LayerMask objectsLayerMask;
+    public Collider[] hits;
+    public List<GameObject> objectsInViewport = new List<GameObject>();
 
     [Range(0, 180)]
     public int fieldOfView = 45;
@@ -29,13 +30,11 @@ public class Perspective : Sense
         }
     }
 
-    public Collider[] hits;
-
-    public List<GameObject> objectsInViewport = new List<GameObject>();
-
     //Detect perspective field of view for the AI Character
     void DetectAspect()
     {
+        objectsInViewport.Clear();
+
         Ray ray = new Ray(transform.position, transform.forward);
         hits = Physics.OverlapSphere(transform.position, viewDistance, objectsLayerMask);
 
@@ -108,6 +107,4 @@ public class Perspective : Sense
 
         //Aspect aspect = hit.collider.GetComponent<Aspect>();
     }
-
-
 }

@@ -16,7 +16,6 @@ public class Controller : MonoBehaviour
     private Animator anim;
     public CharacterController characterController;
 
-
     // Use this for initialization
     void Start()
     {

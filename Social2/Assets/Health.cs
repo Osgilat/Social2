@@ -7,9 +7,9 @@ public class Health : MonoBehaviour
 
     public int healthPoints;
 
-    public void DecreaseHealth()
+    public int DecreaseHealth()
     {
-        healthPoints--;
+        return --healthPoints;
     }
 
     public void IncrementHealth()
