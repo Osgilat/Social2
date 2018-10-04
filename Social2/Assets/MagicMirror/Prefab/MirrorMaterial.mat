@@ -4,7 +4,7 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: MirrorMaterial
   m_Shader: {fileID: 4800000, guid: 257a8b4d70710924f88ec03f5c74c396, type: 3}
