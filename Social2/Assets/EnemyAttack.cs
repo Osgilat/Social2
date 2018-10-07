@@ -17,8 +17,10 @@ public class EnemyAttack : MonoBehaviour
 
     public void DissolveGhost()
     {
+        
         if (!GetComponent<Health>().canHarmPlayer)
         {
+            Logger.LogAction("GhostDissappered", gameObject, null);
             gameObject.SetActive(false);
         }
     }
@@ -29,6 +31,7 @@ public class EnemyAttack : MonoBehaviour
         if (other.gameObject.GetComponent<Aspect>().aspectType == Aspect.AspectTypes.PLAYER)
         {
             player = other.gameObject;
+            
             isNearPlayer = true;
             _animator.SetBool("IsNearPlayer", true);
         }

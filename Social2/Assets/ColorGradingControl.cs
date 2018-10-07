@@ -22,7 +22,7 @@ public class ColorGradingControl : MonoBehaviour {
         //copy current settings from the profile into a temporary variable
         colorGradingSettings = ppProfile.colorGrading.settings;
 
-        Debug.Log("SATURATION " + saturation);
+        //Debug.Log("SATURATION " + saturation);
         colorGradingSettings.basic.saturation = saturation;
 
         ppProfile.colorGrading.settings = colorGradingSettings;

@@ -6,7 +6,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
     [RequireComponent(typeof (UnityEngine.AI.NavMeshAgent))]
     public class AIController : MonoBehaviour
     {
-        public UnityEngine.AI.NavMeshAgent agent { get; private set; }             // the navmesh agent required for the path finding
+        public UnityEngine.AI.NavMeshAgent agent { get; private set; }    // the navmesh agent required for the path finding
         public ThirdPersonCharacter character { get; private set; } // the character we are controlling
         public Transform target;                                    // target to aim for
         public Animator anim;
@@ -89,7 +89,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 {
                     if (go.tag != null && go.tag != "not")
                     {
-                        if (go.tag != null && go.tag == "Enemy" && go.GetComponent<Health>().healthPoints > 0.0001f && go.active != false && target == null)
+                        if (go.tag != null && go.tag == "Enemy" && go.GetComponent<Health>().healthPoints > 0.0001f
+                            && go.active != false && target == null)
                         {
                             //System.Random rnd = new System.Random();
                             UpdateParameters(4.5f, 8.08f, 4.83f, 3.67f);

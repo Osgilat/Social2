@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class PlayerSync : MonoBehaviour {
 
+    public bool initialisation = true;
 
+    /*
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
@@ -13,4 +15,20 @@ public class PlayerSync : MonoBehaviour {
             gameObject.transform.GetChild(0).gameObject.SetActive(true);
         }
     }
+    */
+
+    private void Awake()
+    {
+        if (GameObject.FindGameObjectsWithTag("Player").Length > 1 &&
+            initialisation)
+        {
+            Destroy(gameObject);
+
+        }
+
+        initialisation = false;
+        DontDestroyOnLoad(gameObject);
+    }
+
+
 }

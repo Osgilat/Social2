@@ -11,10 +11,11 @@ public class MirrorTrigger : MonoBehaviour {
         if (other.gameObject.tag == "Player" && other.gameObject.activeInHierarchy && 
             !triggered)
         {
+            Logger.LogAction("MirrorEntered", other.gameObject, null);
             triggered = true;
-            other.gameObject.GetComponent<Health>().TriggerMirror();
+            other.gameObject.GetComponent<GameStates>().TriggerMirror();
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<VignetteControl>().ChangeVignetteAtEnd();
-            other.transform.position = other.gameObject.GetComponent<Health>().initialPlayerPosition;
+            other.transform.position = other.gameObject.GetComponent<GameStates>().initialPlayerPosition;
             gameObject.SetActive(false);
         }
     }

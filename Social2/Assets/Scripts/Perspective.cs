@@ -64,6 +64,10 @@ public class Perspective : Sense
                         if (!objectsInViewport.Contains(hitInfo.collider.gameObject))
                         {
                             objectsInViewport.Add(hitInfo.collider.gameObject);
+                            if(hitInfo.collider.gameObject.GetComponent<Aspect>().aspectType == Aspect.AspectTypes.ENEMY)
+                            {
+                                GetComponent<SoundController>().OnSkeletonSee();
+                            }
                         }
                         
                     }

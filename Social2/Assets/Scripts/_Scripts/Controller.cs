@@ -97,7 +97,7 @@ public class Controller : MonoBehaviour
                 {
 
                     FindClosestEnemy().GetComponent<Health>().DecreaseHealth();
-                    Debug.Log("PlayerDamaged");
+                    Logger.LogAction("Attacked", gameObject, FindClosestEnemy());
                 }
                 anim.Play("Slash" + n);
 
