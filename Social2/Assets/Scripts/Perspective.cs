@@ -33,7 +33,8 @@ public class Perspective : Sense
     //Detect perspective field of view for the AI Character
     void DetectAspect()
     {
-        objectsInViewport.Clear();
+        /*Knight can forget what he saw*/
+        //objectsInViewport.Clear();
 
         Ray ray = new Ray(transform.position, transform.forward);
         hits = Physics.OverlapSphere(transform.position, viewDistance, objectsLayerMask);
@@ -64,51 +65,68 @@ public class Perspective : Sense
                         if (!objectsInViewport.Contains(hitInfo.collider.gameObject))
                         {
                             objectsInViewport.Add(hitInfo.collider.gameObject);
-                            if(hitInfo.collider.gameObject.GetComponent<Aspect>().aspectType == Aspect.AspectTypes.ENEMY)
+                            if (hitInfo.collider.gameObject.GetComponent<Aspect>().aspectType == Aspect.AspectTypes.ENEMY)
                             {
                                 GetComponent<SoundController>().OnSkeletonSee();
+                                if (GetComponent<GameStates>().swordEquiped)
+                                {
+                                    GetComponent<SituationController>().currentSituation
+                                    = SituationController.Situation.ArmedSeeSkeleton;
+                                }
+                                else
+                                {
+                                    GetComponent<SituationController>().currentSituation
+                                    = SituationController.Situation.UnarmedSeeSkeleton;
+                                }
+
                             }
+
+                            if (hitInfo.collider.gameObject.GetComponent<Aspect>().aspectType == Aspect.AspectTypes.REWARD)
+                            {
+                                GetComponent<SituationController>().currentSituation
+                                    = SituationController.Situation.SeeTreasure;
+                            }
+
                         }
-                        
+
                     }
 
-                }
-
-                if (bestHit == null || directionToObject.sqrMagnitude < bestHitDistance)
-                {
+                    if (bestHit == null || directionToObject.sqrMagnitude < bestHitDistance)
+                    {
 
 
-                    bestHit = hits[i];
-                    bestHitDistance = directionToObject.sqrMagnitude;
+                        bestHit = hits[i];
+                        bestHitDistance = directionToObject.sqrMagnitude;
 
 
+                    }
                 }
             }
-        }
-        
-        /*
-        foreach (GameObject item in objectsInViewport)
-        {
-            if (Physics.Raycast(transform.position,
-                (item.transform.position) - transform.position, out hitInfo) == false)
+
+            /*
+            foreach (GameObject item in objectsInViewport)
             {
-
+                if (Physics.Raycast(transform.position,
+                    (item.transform.position) - transform.position, out hitInfo) == false)
                 {
-                    objectsInViewport.Remove(item);
+
+                    {
+                        objectsInViewport.Remove(item);
+                    }
                 }
             }
+            */
+
+
+            if (bestHit != null)
+            {
+                closestObject = bestHit.gameObject;
+            }
+
+
+
+
+            //Aspect aspect = hit.collider.GetComponent<Aspect>();
         }
-        */
-        
-
-        if (bestHit != null)
-        {
-            closestObject = bestHit.gameObject;
-        }
-
-
-
-
-        //Aspect aspect = hit.collider.GetComponent<Aspect>();
     }
 }

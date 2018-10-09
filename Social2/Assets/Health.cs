@@ -24,13 +24,18 @@ public class Health : MonoBehaviour
 
     public bool isPlayer = false;
 
+    SituationController situationController;
+    GameStates gameStates;
+
     private void Start()
     {
         isPlayer = (gameObject.name == "Paladin");
 
         initialHealth = healthPoints;
         storedHealth = healthPoints;
-        
+
+        situationController = GetComponent<SituationController>();
+        gameStates = GetComponent<GameStates>();
     }
 
     public void ResetHealth()
@@ -64,6 +69,9 @@ public class Health : MonoBehaviour
                     c.enabled = false;
                 }
 
+                GameObject.FindGameObjectWithTag("Player").GetComponent<SituationController>()
+                .currentSituation = SituationController.Situation.KilledEnemy;
+
                 GetComponent<Animator>().enabled = true;
                 GetComponent<Animator>().SetTrigger("Die");
             }
@@ -73,14 +81,38 @@ public class Health : MonoBehaviour
     }
 
     public bool canHarmPlayer = false;
+    public GameObject player;
 
     public void PlayerHit()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
         if (canHarmPlayer)
         {
-            Logger.LogAction("Attacked", gameObject, GameObject.FindGameObjectWithTag("Player"));
-            GameObject.FindGameObjectWithTag("Player").
-                GetComponent<Health>().DecreaseHealth();
+            Logger.LogAction("Attacked", gameObject, player);
+            player.GetComponent<Health>().DecreaseHealth();
+            if(player.GetComponent<Health>().storedHealth > 1)
+            {
+                player.GetComponent<SituationController>()
+                .currentSituation = SituationController.Situation.HurtByEnemy;
+            } else
+            {
+                player.GetComponent<SituationController>()
+                .currentSituation = SituationController.Situation.KnightKilled;
+            }
+            
+        } else
+        {
+            if (player.GetComponent<GameStates>().swordEquiped)
+            {
+                player.GetComponent<SituationController>()
+                .currentSituation = SituationController.Situation.GhostDissolvedWhenArmed;
+            }
+            else
+            {
+                player.GetComponent<SituationController>()
+                .currentSituation = SituationController.Situation.GhostDissolvedWhenArmed;
+            }
+
         }
     }
 
@@ -107,13 +139,17 @@ public class Health : MonoBehaviour
 
     public void PotionDrink()
     {
-        if (!potion.activeInHierarchy)
+        if (!potion.activeInHierarchy || storedHealth == initialHealth)
         {
             return;
         }
 
         Logger.LogAction("PotionUsed", gameObject, null);
+
         ResetHealth();
+
+        situationController.currentSituation = SituationController.Situation.DrinkedPotion;
+        gameStates.potionEquiped = false;
         potion.SetActive(false);
         potion.transform.parent = initialParentTransform;
         potion.transform.localPosition = initialPotionPosition;

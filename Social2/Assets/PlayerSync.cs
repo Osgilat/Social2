@@ -23,8 +23,7 @@ public class PlayerSync : MonoBehaviour {
             initialisation)
         {
             Destroy(gameObject);
-
-        }
+        } 
 
         initialisation = false;
         DontDestroyOnLoad(gameObject);

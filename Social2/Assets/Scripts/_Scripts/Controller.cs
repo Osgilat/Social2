@@ -15,10 +15,15 @@ public class Controller : MonoBehaviour
     private float inputV;
     private Animator anim;
     public CharacterController characterController;
+    private Health health;
+
+    SituationController situationController;
 
     // Use this for initialization
     void Start()
     {
+        health = GetComponent<Health>();
+        situationController = GetComponent<SituationController>();
         anim = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
     }
@@ -75,6 +80,11 @@ public class Controller : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.X))
         {
+            if(health.storedHealth == health.initialHealth)
+            {
+                return;
+            }
+
             if (GetComponent<PickingUpController>().potion.activeInHierarchy)
             {
                 anim.Play("Drinking");
@@ -95,9 +105,10 @@ public class Controller : MonoBehaviour
 
                 if(Vector3.Distance(FindClosestEnemy().transform.position, transform.position) < distanceToHit)
                 {
-
+                    situationController.currentSituation = SituationController.Situation.AttackingEnemy;
                     FindClosestEnemy().GetComponent<Health>().DecreaseHealth();
                     Logger.LogAction("Attacked", gameObject, FindClosestEnemy());
+
                 }
                 anim.Play("Slash" + n);
 

@@ -21,6 +21,16 @@ public class EnemyAttack : MonoBehaviour
         if (!GetComponent<Health>().canHarmPlayer)
         {
             Logger.LogAction("GhostDissappered", gameObject, null);
+            if (player.GetComponent<GameStates>().swordEquiped)
+            {
+                player.GetComponent<SituationController>()
+                .currentSituation = SituationController.Situation.GhostDissolvedWhenArmed;
+            }
+            else
+            {
+                player.GetComponent<SituationController>()
+                .currentSituation = SituationController.Situation.GhostDissolvedWhenUnarmed;
+            }
             gameObject.SetActive(false);
         }
     }

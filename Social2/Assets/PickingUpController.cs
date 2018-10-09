@@ -11,12 +11,26 @@ public class PickingUpController : MonoBehaviour
     public GameObject potion;
     public GameObject victoryClip;
 
+    
+
+    SituationController situationController;
+    SoundController soundController;
+    GameStates gameStates;
+
+    private void Start()
+    {
+        situationController = GetComponent<SituationController>();
+        soundController = GetComponent<SoundController>();
+        gameStates = GetComponent<GameStates>();
+    }
+
     public void UnequipAll()
     {
         sword.SetActive(false);
         shield.SetActive(false);
         potion.SetActive(false);
-        GetComponent<GameStates>().swordEquiped = false;
+        gameStates.swordEquiped = false;
+        gameStates.potionEquiped = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -27,20 +41,25 @@ public class PickingUpController : MonoBehaviour
                 Logger.LogAction("SwordEquip", gameObject, null);
                 sword.SetActive(true);
                 shield.SetActive(true);
-                GetComponent<GameStates>().swordEquiped = true;
-                GetComponent<SoundController>().OnSwordPickup();
+
+                gameStates.swordEquiped = true;
+                soundController.OnSwordPickup();
+                situationController.currentSituation = SituationController.Situation.SwordPickup; 
                 other.gameObject.SetActive(false);
                 break;
             case "Potion":
                 Logger.LogAction("PotionEquip", gameObject, null);
                 potion.SetActive(true);
-                GetComponent<SoundController>().OnPotionPickup();
+                gameStates.potionEquiped = true;
+                soundController.OnPotionPickup();
+                situationController.currentSituation = SituationController.Situation.PotionPickup;
                 Destroy(other.gameObject);
                 break;
             case "RealTreasure":
                 Logger.LogAction("FoundTreasure", gameObject, null);
                 other.gameObject.GetComponent<Chest>().openedChest.SetActive(true);
                 other.gameObject.GetComponent<Chest>().closedChest.SetActive(false);
+                situationController.currentSituation = SituationController.Situation.AchievedTrueTreasure;
                 StartCoroutine(WinGame());
 
                 break;
@@ -48,6 +67,7 @@ public class PickingUpController : MonoBehaviour
                 Logger.LogAction("FoundFakeTreasure", gameObject, null);
                 other.gameObject.GetComponent<Chest>().openedChest.SetActive(true);
                 other.gameObject.GetComponent<Chest>().closedChest.SetActive(false);
+                situationController.currentSituation = SituationController.Situation.AchievedFakeTreasure;
                 break;
             default:
                 break;
@@ -75,9 +95,10 @@ public class PickingUpController : MonoBehaviour
         yield return new WaitForSeconds(5);
         //victoryClip.SetActive(true);
         ShowText("YOU WON");
-        GetComponent<SoundController>().OnWon();
+        situationController.currentSituation = SituationController.Situation.WinnedRound;
+        soundController.OnWon();
         yield return new WaitForSeconds(5);
-        gameObject.transform.position = gameObject.GetComponent<GameStates>().initialPlayerPosition;
+        gameObject.transform.position = GameObject.Find("SpawnPoint").transform.position; ;
         gameObject.GetComponent<Health>().healthPoints = 0;
         yield return new WaitForSeconds(15);
         HideText();

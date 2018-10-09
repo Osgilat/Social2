@@ -15,7 +15,8 @@ public class MirrorTrigger : MonoBehaviour {
             triggered = true;
             other.gameObject.GetComponent<GameStates>().TriggerMirror();
             GameObject.FindGameObjectWithTag("MainCamera").GetComponent<VignetteControl>().ChangeVignetteAtEnd();
-            other.transform.position = other.gameObject.GetComponent<GameStates>().initialPlayerPosition;
+            other.transform.position = GameObject.Find("SpawnPoint").transform.position;
+            //other.gameObject.GetComponent<GameStates>().initialPlayerPosition;
             gameObject.SetActive(false);
         }
     }

@@ -6,7 +6,9 @@ public class GameStates : MonoBehaviour {
 
     public GameObject addedSkeleton;
     public GameObject swordToRemove;
+
     public bool swordEquiped = false;
+    public bool potionEquiped = false;
 
     public bool reloadLevel = false;
 
@@ -18,6 +20,7 @@ public class GameStates : MonoBehaviour {
     public GameObject initialPlayer;
     public Health healthComponent;
 
+    SituationController situationController;
 
     public bool reinitializeAI = false;
 
@@ -27,6 +30,7 @@ public class GameStates : MonoBehaviour {
         isPlayer = (gameObject.name == "Paladin");
         anim = GetComponent<Animator>();
         healthComponent = GetComponent<Health>();
+        situationController = GetComponent<SituationController>();
 
         if (isPlayer)
         {
@@ -40,6 +44,7 @@ public class GameStates : MonoBehaviour {
         if (isPlayer)
         {
             //Debug.Log("Triggered mirror");
+            situationController.currentSituation = SituationController.Situation.TriggeredMirror;
             StartCoroutine(ReloadGame(false));
         }
     }
@@ -67,12 +72,13 @@ public class GameStates : MonoBehaviour {
         if (isDied)
         {
             Logger.LogAction("PlayerDied", gameObject, null);
+
             GetComponent<Animator>().enabled = true;
             GetComponent<Animator>().SetTrigger("Die");
         }
 
         yield return new WaitForSeconds(4);
-
+        
         Application.LoadLevel(Application.loadedLevel);
 
         yield return new WaitForSeconds(3);
@@ -98,8 +104,11 @@ public class GameStates : MonoBehaviour {
 
         }
 
+        situationController.currentSituation = SituationController.Situation.RoundBegin;
         anim.Play("Respawn");
-        gameObject.transform.position = initialPlayerPosition;
+        //gameObject.transform.position = initialPlayerPosition;
+        gameObject.transform.position = GameObject.Find("SpawnPoint").transform.position;
+        GetComponent<Perspective>().objectsInViewport.Clear();
     }
 
     private void ReinitializeComponents()
