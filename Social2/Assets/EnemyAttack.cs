@@ -41,7 +41,8 @@ public class EnemyAttack : MonoBehaviour
         if (other.gameObject.GetComponent<Aspect>().aspectType == Aspect.AspectTypes.PLAYER)
         {
             player = other.gameObject;
-            
+
+            player.GetComponent<Wandering>().inBattle = true;
             isNearPlayer = true;
             _animator.SetBool("IsNearPlayer", true);
         }
@@ -51,6 +52,7 @@ public class EnemyAttack : MonoBehaviour
     {
         if (other.gameObject.GetComponent<Aspect>().aspectType == Aspect.AspectTypes.PLAYER)
         {
+            player.GetComponent<Wandering>().inBattle = false;
             isNearPlayer = false;
             _animator.SetBool("IsNearPlayer", false);
         }

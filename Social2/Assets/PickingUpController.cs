@@ -11,7 +11,7 @@ public class PickingUpController : MonoBehaviour
     public GameObject potion;
     public GameObject victoryClip;
 
-    
+    public AIController aIController;
 
     SituationController situationController;
     SoundController soundController;
@@ -22,6 +22,7 @@ public class PickingUpController : MonoBehaviour
         situationController = GetComponent<SituationController>();
         soundController = GetComponent<SoundController>();
         gameStates = GetComponent<GameStates>();
+        aIController = GetComponent<AIController>();
     }
 
     public void UnequipAll()
@@ -59,6 +60,14 @@ public class PickingUpController : MonoBehaviour
                 Logger.LogAction("FoundTreasure", gameObject, null);
                 other.gameObject.GetComponent<Chest>().openedChest.SetActive(true);
                 other.gameObject.GetComponent<Chest>().closedChest.SetActive(false);
+                foreach (SphereCollider sphereCollider in other.gameObject.GetComponents<SphereCollider>())
+                {
+                    //if (sphereCollider.isTrigger)
+                    {
+                        sphereCollider.enabled = false;
+                    }
+                }
+                
                 situationController.currentSituation = SituationController.Situation.AchievedTrueTreasure;
                 StartCoroutine(WinGame());
 
@@ -67,6 +76,8 @@ public class PickingUpController : MonoBehaviour
                 Logger.LogAction("FoundFakeTreasure", gameObject, null);
                 other.gameObject.GetComponent<Chest>().openedChest.SetActive(true);
                 other.gameObject.GetComponent<Chest>().closedChest.SetActive(false);
+                other.gameObject.GetComponent<SphereCollider>().enabled = false;
+                aIController.rewardInViewport = null;
                 situationController.currentSituation = SituationController.Situation.AchievedFakeTreasure;
                 break;
             default:

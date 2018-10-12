@@ -22,8 +22,6 @@ public class GameStates : MonoBehaviour {
 
     SituationController situationController;
 
-    public bool reinitializeAI = false;
-
     private void Start()
     {
         
@@ -45,6 +43,7 @@ public class GameStates : MonoBehaviour {
         {
             //Debug.Log("Triggered mirror");
             situationController.currentSituation = SituationController.Situation.TriggeredMirror;
+            GetComponent<AIController>().mirrorInViewport = null;
             StartCoroutine(ReloadGame(false));
         }
     }
@@ -108,20 +107,18 @@ public class GameStates : MonoBehaviour {
         anim.Play("Respawn");
         //gameObject.transform.position = initialPlayerPosition;
         gameObject.transform.position = GameObject.Find("SpawnPoint").transform.position;
+        GetComponent<AIController>().initialActionsExecuted = false;
         GetComponent<Perspective>().objectsInViewport.Clear();
     }
+
+    public bool aIenabled = false;
 
     private void ReinitializeComponents()
     {
         foreach (MonoBehaviour c in GetComponents<MonoBehaviour>())
         {
             if (c.GetType().ToString()
-                == "UnityStandardAssets.Characters.ThirdPerson.AIController"
-                && !reinitializeAI
-                || c.GetType().ToString()
-                == "Wander"
-                || c.GetType().ToString()
-                == "Wandering")
+                == "Wandering" && !aIenabled)
 
             {
                 c.enabled = false;

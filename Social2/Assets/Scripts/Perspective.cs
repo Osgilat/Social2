@@ -15,11 +15,18 @@ public class Perspective : Sense
 
     public Transform playerTransform;
     public Vector3 rayDirection;
+    public AIController aIController;
+
+    private void Start()
+    {
+        aIController = GetComponent<AIController>();
+    }
 
     protected override void Initialize()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
     }
+
     protected override void UpdateSense()
     {
         elapsedTime += Time.deltaTime;
@@ -29,6 +36,7 @@ public class Perspective : Sense
             DetectAspect();
         }
     }
+
 
     //Detect perspective field of view for the AI Character
     void DetectAspect()
@@ -85,6 +93,21 @@ public class Perspective : Sense
                             {
                                 GetComponent<SituationController>().currentSituation
                                     = SituationController.Situation.SeeTreasure;
+                            }
+
+                            if (hitInfo.collider.gameObject.GetComponent<Aspect>().aspectType == Aspect.AspectTypes.MIRROR)
+                            {
+                                aIController.actions.Find(v => v.ActionID == "EnterMirror").Probability
+                                    = 1.0f;
+                                aIController.mirrorInViewport = hitInfo.collider.gameObject;
+                            }
+
+                            if (hitInfo.collider.gameObject.GetComponent<Aspect>().aspectType == Aspect.AspectTypes.REWARD)
+                            {
+                                aIController.actions.Find(v => v.ActionID == "PickupReward").Probability
+                                    = 1.0f;
+                                aIController.rewardInViewport = hitInfo.collider.gameObject;
+
                             }
 
                         }
