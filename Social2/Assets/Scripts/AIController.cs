@@ -16,11 +16,15 @@ public class AIController : MonoBehaviour
 
     public Action currentAction;
 
+    [System.Serializable]
     public class Action
     {
-        private string actionID;
-        private float probability;
-        private bool isBattleAction;
+        [SerializeField]
+        public string actionID;
+        [SerializeField]
+        public float probability;
+        [SerializeField]
+        public bool isBattleAction;
 
         public Action(string actionID, float probability, bool isBattleAction)
         {
@@ -28,7 +32,7 @@ public class AIController : MonoBehaviour
             this.probability = probability;
             this.isBattleAction = isBattleAction;
         }
-
+        [SerializeField]
         public string ActionID
         {
             get
@@ -36,7 +40,7 @@ public class AIController : MonoBehaviour
                 return actionID;
             }
         }
-
+        [SerializeField]
         public float Probability
         {
             get
@@ -49,7 +53,7 @@ public class AIController : MonoBehaviour
                 probability = value;
             }
         }
-
+        [SerializeField]
         public bool IsBattleAction
         {
             get
@@ -59,7 +63,10 @@ public class AIController : MonoBehaviour
         }
     }
 
+   
     public List<Action> actions = new List<Action>();
+
+   // public List<String>
 
     // Use this for initialization
     void Start()
@@ -70,6 +77,8 @@ public class AIController : MonoBehaviour
         gameStates = GetComponent<GameStates>();
         mover = GetComponent<Wandering>();
         controller = GetComponent<Controller>();
+
+        lastHP = health.initialHealth;
 
         actions.Add(new Action("Heal", 0.0f, false));
         actions.Add(new Action("PickupReward", 0.0f, false));
@@ -141,14 +150,14 @@ public class AIController : MonoBehaviour
             lastHP = health.storedHealth;
 
             actions.Find(obj => obj.ActionID == "Heal").Probability
-                = (health.initialHealth - lastHP + 1) / health.initialHealth;
+                //= (health.initialHealth - health.storedHealth + 1) / health.initialHealth;
+                = ((float)health.initialHealth / (health.storedHealth + 1) - 1.0f);
 
-            if(mirrorInViewport != null)
-            {
                 actions.Find(obj => obj.ActionID == "EnterMirror").Probability
-                = (health.initialHealth - lastHP + 1) / health.initialHealth;
-            }
-            
+                //= (health.initialHealth - health.storedHealth + 1) / health.initialHealth;
+
+                = ((float)health.initialHealth / (health.storedHealth + 1) - 1.0f);
+
         }
 
         if (rewardInViewport == null)
@@ -157,7 +166,7 @@ public class AIController : MonoBehaviour
                 = 0.0f;
         }
 
-        if (mirrorInViewport == null)
+        if (mirrorInViewport == null || gameStates.potionEquiped)
         {
             actions.Find(obj => obj.ActionID == "EnterMirror").Probability
                 = 0.0f;
@@ -199,6 +208,8 @@ public class AIController : MonoBehaviour
         {
             if (skeletonToAttack == null || !skeletonToAttack.activeInHierarchy)
             {
+                actions.Find(obj => obj.ActionID == "AttackToEnd").Probability
+                = 0.0f;
                 mover.inBattle = false;
                 skeletonToAttack = FindClosestAliveEnemy();
             }

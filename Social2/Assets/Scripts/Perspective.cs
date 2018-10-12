@@ -78,6 +78,9 @@ public class Perspective : Sense
                                 GetComponent<SoundController>().OnSkeletonSee();
                                 if (GetComponent<GameStates>().swordEquiped)
                                 {
+                                    aIController.actions.Find(v => v.ActionID == "EnterMirror").Probability
+                                    = 0.3f;
+
                                     GetComponent<SituationController>().currentSituation
                                     = SituationController.Situation.ArmedSeeSkeleton;
                                 }

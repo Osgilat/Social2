@@ -22281,7 +22281,12 @@ MonoBehaviour:
   mover: {fileID: 0}
   situationController: {fileID: 0}
   controller: {fileID: 0}
-  initialTimer: 5
+  currentAction:
+    actionID: 
+    probability: 0
+    isBattleAction: 0
+  actions: []
+  initialTimer: 1
   sawSkeleton: 0
   sawReward: 0
   skeletonToAttack: {fileID: 0}
@@ -22290,6 +22295,7 @@ MonoBehaviour:
   currentActionID: 
   rewardInViewport: {fileID: 0}
   mirrorInViewport: {fileID: 0}
+  initialActionsExecuted: 0
 --- !u!114 &1212032889
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22376,7 +22382,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d58f8bcf94acf3249b62a98d801d1475, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wanderRadius: 20
+  wanderRadius: 35.1
   wanderTimer: 10
   agent: {fileID: 0}
   anim: {fileID: 0}
