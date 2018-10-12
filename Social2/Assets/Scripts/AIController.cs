@@ -1,210 +1,296 @@
-using System;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-namespace UnityStandardAssets.Characters.ThirdPerson
+public class AIController : MonoBehaviour
 {
-    [RequireComponent(typeof (UnityEngine.AI.NavMeshAgent))]
-    public class AIController : MonoBehaviour
+
+    public Perspective perspective;
+    public Health health;
+    public PickingUpController pickingUpController;
+    public GameStates gameStates;
+    public Wandering mover;
+    public SituationController situationController;
+    public Controller controller;
+
+    public Action currentAction;
+
+    [System.Serializable]
+    public class Action
     {
-        public UnityEngine.AI.NavMeshAgent agent { get; private set; }             // the navmesh agent required for the path finding
-        public ThirdPersonCharacter character { get; private set; } // the character we are controlling
-        public Transform target;                                    // target to aim for
-        public Animator anim;
-        public float distanceToHit = 3.0f;
-        Vector3 moveDir = Vector3.zero;
-        float rotation = 0.0f;
-        public float rotationSpeed = 80;
-        public CharacterController characterController;
+        [SerializeField]
+        public string actionID;
+        [SerializeField]
+        public float probability;
+        [SerializeField]
+        public bool isBattleAction;
 
-        /* BICA AI */
-        public float mood;
-        public float intensity;
-        public float opportunity;
-        public float dominance;
-        public float agentVelocity;
-
-
-        private void Start()
+        public Action(string actionID, float probability, bool isBattleAction)
         {
-            // get the components on the object we need ( should not be null due to require component so no need to check )
-            characterController = GetComponent<CharacterController>();
-            agent = GetComponentInChildren<UnityEngine.AI.NavMeshAgent>();
-            anim = GetComponent<Animator>();
-	        agent.updateRotation = true;
-	        agent.updatePosition = true;
-            agent.stoppingDistance = 0.0002f;
-
-
-            /* BICA AI */
-            mood = 4.83f;
-            intensity = 4.83f;
-            opportunity = 7.08f;
-            dominance = 5.17f;
-            agent.speed = CalculateSpeed();
+            this.actionID = actionID;
+            this.probability = probability;
+            this.isBattleAction = isBattleAction;
         }
-
-        private void Update()
+        [SerializeField]
+        public string ActionID
         {
-            System.Random rnd = new System.Random();
-
-            if (agent.velocity.magnitude >= 0)
+            get
             {
-                agentVelocity = agent.velocity.magnitude;
-                anim.SetFloat("Forward", agent.velocity.magnitude);
-            }
-
-            if (target != null)
-            {
-                agent.SetDestination(target.position);
-            }
-
-            if (agent.remainingDistance != 0.0f && agent.remainingDistance < agent.stoppingDistance)
-            {
-                target = null;
-                agent.ResetPath();
-                anim.SetFloat("Forward", 0.0f);
-            }
-            //    agent.ResetPath();
-            //    anim.SetFloat("Forward", 0.0f);
-            //}*/
-
-            //if (GetComponent<PickingUpController>().sword.activeInHierarchy)
-            //{
-            //    target = null;
-                //agent.ResetPath();
-                //anim.SetFloat("Forward", 0.0f);
-            //}
-
-
-
-            /* BICA AI */
-            agent.speed = CalculateSpeed();
-            if (agent.velocity.magnitude <= 0.000001f)
-            {
-                float H;
-                H = rnd.Next() % 100;
-                MoveCharacter(0.0f, H / 300.0f);
-
-                foreach (GameObject go in GetComponent<Perspective>().objectsInViewport)
-                {
-                    if (go.tag != null && go.tag != "not")
-                    {
-                        if (go.tag != null && go.tag == "Enemy" && go.GetComponent<Health>().healthPoints > 0.0001f && go.active != false && target == null)
-                        {
-                            //System.Random rnd = new System.Random();
-                            UpdateParameters(4.5f, 8.08f, 4.83f, 3.67f);
-                            if (rnd.Next() % Math.Floor(mood + opportunity + dominance * 3.0) > 15)
-                            {
-                                SetTarget(go.transform);
-                            }
-                            else
-                            {
-                                //go.tag = "not";
-                            }
-                        }
-                        else if ((go.tag == null || go.tag != "Enemy") && target == null)
-                        {
-                            SetTarget(go.transform);
-                        }
-                    }
-                }
-            }
-
-            DrinkPotion();
-            AttackOnce();
-
-        }
-
-        public void DrinkPotion()
-        {
-            if (GetComponent<PickingUpController>().potion.activeInHierarchy)
-            {
-                UpdateParameters(6.17f, 4.92f, 6.33f, 5.92f);
-                anim.Play("Drinking");
+                return actionID;
             }
         }
-
-        public void AttackOnce()
+        [SerializeField]
+        public float Probability
         {
-            if (GetComponent<PickingUpController>().sword.activeInHierarchy)
+            get
             {
-                GameObject go = FindClosestEnemy();
-                if (Vector3.Distance(go.transform.position, transform.position) < distanceToHit &&
-                    go.GetComponent<Health>().healthPoints > 0.0f &&
-                    !anim.GetCurrentAnimatorStateInfo(0).IsName("Slash1"))
-                {
+                return probability;
+            }
 
-                    if(FindClosestEnemy().GetComponent<Health>().DecreaseHealth() <= 0.0001f)
-                    {
-                        UpdateParameters(6.75f, 5.33f, 6.75f, 6.00f);
-                        target = null;
-                        agent.ResetPath();
-                        anim.SetFloat("Forward", 0.0f);
-                    }
-                    Debug.Log("PlayerDamaged");
-                    anim.Play("Slash1");
-                }
+            set
+            {
+                probability = value;
             }
         }
-
-
-        public GameObject FindClosestEnemy()
+        [SerializeField]
+        public bool IsBattleAction
         {
-            GameObject[] gos;
-            gos = GameObject.FindGameObjectsWithTag("Enemy");
-            GameObject closest = null;
-            float distance = Mathf.Infinity;
-            Vector3 position = transform.position;
-            foreach (GameObject go in gos)
+            get
             {
-                Vector3 diff = go.transform.position - position;
+                return isBattleAction;
+            }
+        }
+    }
+
+   
+    public List<Action> actions = new List<Action>();
+
+   // public List<String>
+
+    // Use this for initialization
+    void Start()
+    {
+        perspective = GetComponent<Perspective>();
+        health = GetComponent<Health>();
+        pickingUpController = GetComponent<PickingUpController>();
+        gameStates = GetComponent<GameStates>();
+        mover = GetComponent<Wandering>();
+        controller = GetComponent<Controller>();
+
+        lastHP = health.initialHealth;
+
+        actions.Add(new Action("Heal", 0.0f, false));
+        actions.Add(new Action("PickupReward", 0.0f, false));
+        actions.Add(new Action("Wander", 1.0f, false));
+        actions.Add(new Action("EnterMirror", 0.0f, false));
+        actions.Add(new Action("AttackToEnd", 0.0f, true));
+    }
+
+    private float timer = 5.0f;
+    public float initialTimer = 5.0f;
+
+    public bool sawSkeleton = false;
+    public bool sawReward = false;
+
+    public GameObject FindClosestAliveEnemy()
+    {
+        GameObject closest = null;
+        float distance = Mathf.Infinity;
+        Vector3 position = transform.position;
+        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
+        {
+            if (enemy.GetComponent<Health>().healthPoints >= 0 &&
+                perspective.objectsInViewport.Contains(enemy))
+            {
+                Vector3 diff = enemy.transform.position - position;
                 float curDistance = diff.sqrMagnitude;
                 if (curDistance < distance)
                 {
-                    closest = go;
+                    closest = enemy;
                     distance = curDistance;
                 }
             }
-            return closest;
+        }
+        return closest;
+    }
+
+    public GameObject skeletonToAttack;
+
+    public bool inBattle = false;
+
+    public int lastHP = 0;
+
+    public string currentActionID;
+
+    public GameObject rewardInViewport;
+    public GameObject mirrorInViewport;
+
+    // Update is called once per frame
+    void Update()
+    {
+
+         timer -= Time.deltaTime;
+
+        if (timer < 0)
+        {
+            timer = initialTimer;
+            ChangeActionToExecute();
         }
 
-        public void SetTarget(Transform target)
+        if (currentAction == null)
         {
-            this.target = target;
+            return;
         }
 
-        public float CalculateSpeed()
+        currentActionID = currentAction.ActionID;
+
+        if (lastHP != health.storedHealth)
         {
-            return (mood * 1.0f + intensity * 3.0f + opportunity * 1.0f + dominance * 0.5f) / 10.0f;
+            lastHP = health.storedHealth;
+
+            actions.Find(obj => obj.ActionID == "Heal").Probability
+                //= (health.initialHealth - health.storedHealth + 1) / health.initialHealth;
+                = ((float)health.initialHealth / (health.storedHealth + 1) - 1.0f);
+
+                actions.Find(obj => obj.ActionID == "EnterMirror").Probability
+                //= (health.initialHealth - health.storedHealth + 1) / health.initialHealth;
+
+                = ((float)health.initialHealth / (health.storedHealth + 1) - 1.0f);
+
         }
 
-        public void UpdateParameters(float mood, float intensity, float opportunity, float dominance)
+        if (rewardInViewport == null)
         {
-            this.mood        = (this.mood        + mood        * 4.0f) / 5.0f;
-            this.intensity   = (this.intensity   + intensity   * 2.0f) / 3.0f;
-            this.opportunity = (this.opportunity + opportunity * 2.0f) / 3.0f;
-            this.dominance   = (this.dominance   + dominance   * 2.0f) / 3.0f;
+            actions.Find(obj => obj.ActionID == "PickupReward").Probability
+                = 0.0f;
         }
 
-        private void MoveCharacter(float V, float H)
+        if (mirrorInViewport == null || gameStates.potionEquiped)
         {
-            float speed = CalculateSpeed();
-            if (V > 0)
+            actions.Find(obj => obj.ActionID == "EnterMirror").Probability
+                = 0.0f;
+        }
+      
+
+        if (currentAction.ActionID == "EnterMirror" && !mover.inBattle)
+        {
+            if (!gameStates.potionEquiped)
             {
-                moveDir = new Vector3(0, 0, 1);
-                moveDir *= speed;
-                moveDir = transform.TransformDirection(moveDir);
+                if (mirrorInViewport != null)
+                {
+                    mover.targetToMove = mirrorInViewport;
+                }
             }
-            else
+
+        }
+
+        if (currentAction.ActionID == "PickupReward" && !mover.inBattle)
+        {
+            if (rewardInViewport != null && skeletonToAttack == null)
             {
-                moveDir = Vector3.zero;
+                mover.targetToMove = rewardInViewport;
             }
 
-            rotation += H * rotationSpeed * Time.deltaTime;
-            transform.eulerAngles = new Vector3(0, rotation, 0);
+        }
 
-            characterController.Move(moveDir * Time.deltaTime);
+        if (currentAction.ActionID == "Wander" && !mover.inBattle)
+        {
+            mover.SetRandomWaypoint();
+        }
 
+        if (currentAction.ActionID == "Heal" && gameStates.potionEquiped && !mover.inBattle)
+        {
+            controller.KnightHeal();
+        }
+
+        if (currentAction.ActionID == "AttackToEnd" || mover.inBattle)
+        {
+            if (skeletonToAttack == null || !skeletonToAttack.activeInHierarchy)
+            {
+                actions.Find(obj => obj.ActionID == "AttackToEnd").Probability
+                = 0.0f;
+                mover.inBattle = false;
+                skeletonToAttack = FindClosestAliveEnemy();
+            }
+
+            if (skeletonToAttack != null && skeletonToAttack.activeInHierarchy && gameStates.swordEquiped)
+            {
+                mover.inBattle = true;
+
+                if (skeletonToAttack == null ||
+                    skeletonToAttack.GetComponent<Health>().healthPoints <= 0)
+                {
+                    mover.inBattle = false;
+                    skeletonToAttack = null;
+                    return;
+                }
+
+                if (skeletonToAttack != null)
+                {
+                    if ((skeletonToAttack.transform.position -
+                    transform.position).sqrMagnitude >= controller.distanceToHit)
+                    {
+                        mover.targetToMove = skeletonToAttack;
+                    }
+                    else
+                    {
+                        mover.agent.isStopped = true;
+                        mover.agent.ResetPath();
+                        mover.targetToMove = null;
+                        controller.KnightAttack();
+                    }
+                }
+            }
         }
     }
+
+    public bool initialActionsExecuted = false;
+
+    public void ChangeActionToExecute()
+    {
+        if ((!gameStates.swordEquiped || !gameStates.potionEquiped) && !initialActionsExecuted)
+        {
+            GameObject sword = GameObject.Find("Sword");
+            GameObject potion = GameObject.Find("Potion");
+
+            if (!gameStates.swordEquiped && sword != null)
+            {
+                mover.targetToMove = sword;
+                return;
+            }
+
+            if (!gameStates.potionEquiped && potion != null)
+            {
+                mover.targetToMove = potion;
+                return;
+            }
+
+            if(gameStates.potionEquiped && gameStates.swordEquiped)
+            {
+                initialActionsExecuted = true;
+            }
+        }
+
+        //currentAction = actions[Random.Range(0, actions.ToList().Count - 1)];
+        currentAction = SectorChoose();
+    }
+
+    public Action SectorChoose()
+    {
+        float total = actions.Sum(item => item.Probability);
+        float diceRoll = Random.Range(0.0f, total);
+
+        float cumulative = 0.0f;
+        foreach (Action action in actions)
+        {
+            cumulative += action.Probability;
+            if (diceRoll < cumulative && action.Probability != 0.0f)
+            {
+                return action;
+            }
+        }
+        return actions[0];
+    }
 }
+
