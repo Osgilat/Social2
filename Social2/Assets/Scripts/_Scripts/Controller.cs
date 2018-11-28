@@ -16,12 +16,14 @@ public class Controller : MonoBehaviour
     private Animator anim;
     public CharacterController characterController;
     private Health health;
+    public GameStates gameStates;
 
     SituationController situationController;
 
     // Use this for initialization
     void Start()
     {
+        gameStates = GetComponent<GameStates>();
         health = GetComponent<Health>();
         situationController = GetComponent<SituationController>();
         anim = GetComponent<Animator>();
@@ -74,11 +76,14 @@ public class Controller : MonoBehaviour
     void Update()
     {
 
+        if (!gameStates.enabledAI)
+        {
+            anim.SetFloat("Turn", inputH);
+            anim.SetFloat("Forward", inputV);
+        }
+        
 
-        anim.SetFloat("Turn", inputH);
-        anim.SetFloat("Forward", inputV);
-
-        if (Input.GetKeyDown(KeyCode.X))
+        if (Input.GetKeyDown(KeyCode.X) && !gameStates.enabledAI)
         {
 
             KnightHeal();
@@ -86,8 +91,9 @@ public class Controller : MonoBehaviour
 
         if (!anim.GetCurrentAnimatorStateInfo(0).IsName("Slash1") &&
             !anim.GetCurrentAnimatorStateInfo(0).IsName("Slash2") &&
-            !anim.GetCurrentAnimatorStateInfo(0).IsName("Drinking"))
+            !anim.GetCurrentAnimatorStateInfo(0).IsName("Drinking") && !gameStates.enabledAI)
         {
+
             MoveCharacter();
 
             if (Input.GetMouseButtonDown(0) &&
@@ -162,6 +168,11 @@ public class Controller : MonoBehaviour
 
     private void MoveCharacter()
     {
+        if (gameStates.enabledAI)
+        {
+            return;
+        }
+
         inputH = Input.GetAxis("Horizontal");
         inputV = Input.GetAxis("Vertical");
 

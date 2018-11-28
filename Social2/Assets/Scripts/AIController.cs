@@ -14,10 +14,11 @@ public class AIController : MonoBehaviour
     public SituationController situationController;
     public Controller controller;
 
-    public Action currentAction;
+    public PossibleAction currentAction;
+
 
     [System.Serializable]
-    public class Action
+    public class PossibleAction
     {
         [SerializeField]
         public string actionID;
@@ -26,7 +27,7 @@ public class AIController : MonoBehaviour
         [SerializeField]
         public bool isBattleAction;
 
-        public Action(string actionID, float probability, bool isBattleAction)
+        public PossibleAction(string actionID, float probability, bool isBattleAction)
         {
             this.actionID = actionID;
             this.probability = probability;
@@ -63,14 +64,16 @@ public class AIController : MonoBehaviour
         }
     }
 
-   
-    public List<Action> actions = new List<Action>();
 
-   // public List<String>
+    public List<PossibleAction> actions = new List<PossibleAction>();
+
+
 
     // Use this for initialization
     void Start()
     {
+        FindSwordPotion();
+
         perspective = GetComponent<Perspective>();
         health = GetComponent<Health>();
         pickingUpController = GetComponent<PickingUpController>();
@@ -80,11 +83,11 @@ public class AIController : MonoBehaviour
 
         lastHP = health.initialHealth;
 
-        actions.Add(new Action("Heal", 0.0f, false));
-        actions.Add(new Action("PickupReward", 0.0f, false));
-        actions.Add(new Action("Wander", 1.0f, false));
-        actions.Add(new Action("EnterMirror", 0.0f, false));
-        actions.Add(new Action("AttackToEnd", 0.0f, true));
+        actions.Add(new PossibleAction("Heal", 0.0f, false));
+        actions.Add(new PossibleAction("PickupReward", 0.0f, false));
+        actions.Add(new PossibleAction("Wander", 1.0f, false));
+        actions.Add(new PossibleAction("EnterMirror", 0.0f, false));
+        actions.Add(new PossibleAction("AttackToEnd", 0.0f, true));
     }
 
     private float timer = 5.0f;
@@ -129,14 +132,15 @@ public class AIController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        /*
          timer -= Time.deltaTime;
-
+        
         if (timer < 0)
         {
             timer = initialTimer;
             ChangeActionToExecute();
         }
+        */
 
         if (currentAction == null)
         {
@@ -153,10 +157,10 @@ public class AIController : MonoBehaviour
                 //= (health.initialHealth - health.storedHealth + 1) / health.initialHealth;
                 = ((float)health.initialHealth / (health.storedHealth + 1) - 1.0f);
 
-                actions.Find(obj => obj.ActionID == "EnterMirror").Probability
-                //= (health.initialHealth - health.storedHealth + 1) / health.initialHealth;
+            actions.Find(obj => obj.ActionID == "EnterMirror").Probability
+            //= (health.initialHealth - health.storedHealth + 1) / health.initialHealth;
 
-                = ((float)health.initialHealth / (health.storedHealth + 1) - 1.0f);
+            = ((float)health.initialHealth / (health.storedHealth + 1) - 1.0f);
 
         }
 
@@ -171,7 +175,7 @@ public class AIController : MonoBehaviour
             actions.Find(obj => obj.ActionID == "EnterMirror").Probability
                 = 0.0f;
         }
-      
+
 
         if (currentAction.ActionID == "EnterMirror" && !mover.inBattle)
         {
@@ -204,7 +208,7 @@ public class AIController : MonoBehaviour
             controller.KnightHeal();
         }
 
-        if (currentAction.ActionID == "AttackToEnd" || mover.inBattle)
+        if (currentAction.ActionID == "AttackToEnd" && mover.inBattle)
         {
             if (skeletonToAttack == null || !skeletonToAttack.activeInHierarchy)
             {
@@ -246,14 +250,26 @@ public class AIController : MonoBehaviour
     }
 
     public bool initialActionsExecuted = false;
+   
 
-    public void ChangeActionToExecute()
+    GameObject potion;
+    GameObject sword;
+
+    public void FindSwordPotion()
     {
+        GameObject potion = GameObject.Find("Potion");
+        GameObject sword = GameObject.Find("Sword");
+    }
+
+    public void ChangeActionToExecute(string actionID)
+    {
+        
         if ((!gameStates.swordEquiped || !gameStates.potionEquiped) && !initialActionsExecuted)
         {
+            /*
             GameObject sword = GameObject.Find("Sword");
             GameObject potion = GameObject.Find("Potion");
-
+            */
             if (!gameStates.swordEquiped && sword != null)
             {
                 mover.targetToMove = sword;
@@ -272,17 +288,55 @@ public class AIController : MonoBehaviour
             }
         }
 
+        switch (actionID)
+        {
+            case "Heal":
+                currentAction = actions[0];
+                break;
+            case "PickupReward":
+                currentAction = actions[1];
+                break;
+            case "Wander":
+                currentAction = actions[2];
+                break;
+            case "EnterMirror":
+                currentAction = actions[3];
+                break;
+            case "AttackToEnd":
+                currentAction = actions[4];
+                break;
+            case "Nothing":
+                currentAction = null;
+                break;
+
+
+            default:
+                break;
+
+
+
+        }
+
         //currentAction = actions[Random.Range(0, actions.ToList().Count - 1)];
-        currentAction = SectorChoose();
+        //currentAction = SectorChoose();
+
     }
 
-    public Action SectorChoose()
+    /*
+   actions.Add(new Action("Heal", 0.0f, false));
+       actions.Add(new Action("PickupReward", 0.0f, false));
+       actions.Add(new Action("Wander", 1.0f, false));
+       actions.Add(new Action("EnterMirror", 0.0f, false));
+       actions.Add(new Action("AttackToEnd", 0.0f, true));
+       */
+
+    public PossibleAction SectorChoose()
     {
         float total = actions.Sum(item => item.Probability);
         float diceRoll = Random.Range(0.0f, total);
 
         float cumulative = 0.0f;
-        foreach (Action action in actions)
+        foreach (PossibleAction action in actions)
         {
             cumulative += action.Probability;
             if (diceRoll < cumulative && action.Probability != 0.0f)

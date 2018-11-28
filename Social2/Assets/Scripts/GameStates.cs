@@ -41,7 +41,6 @@ public class GameStates : MonoBehaviour {
     {
         if (isPlayer)
         {
-            //Debug.Log("Triggered mirror");
             situationController.currentSituation = SituationController.Situation.TriggeredMirror;
             GetComponent<AIController>().mirrorInViewport = null;
             StartCoroutine(ReloadGame(false));
@@ -53,7 +52,6 @@ public class GameStates : MonoBehaviour {
         Transform[] objs = Resources.FindObjectsOfTypeAll<Transform>() as Transform[];
         for (int i = 0; i < objs.Length; i++)
         {
-            // if (objs[i].hideFlags == HideFlags.None)
             {
                 if (objs[i].name == name)
                 {
@@ -111,14 +109,14 @@ public class GameStates : MonoBehaviour {
         GetComponent<Perspective>().objectsInViewport.Clear();
     }
 
-    public bool aIenabled = false;
+    public bool enabledAI = false;
 
     private void ReinitializeComponents()
     {
         foreach (MonoBehaviour c in GetComponents<MonoBehaviour>())
         {
             if (c.GetType().ToString()
-                == "Wandering" && !aIenabled)
+                == "Wandering" && !enabledAI)
 
             {
                 c.enabled = false;
