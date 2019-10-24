@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class AIController : MonoBehaviour
 {
-
     public Perspective perspective;
     public Health health;
     public PickingUpController pickingUpController;
@@ -65,8 +64,6 @@ public class AIController : MonoBehaviour
 
    
     public List<Action> actions = new List<Action>();
-
-   // public List<String>
 
     // Use this for initialization
     void Start()
@@ -129,7 +126,6 @@ public class AIController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
          timer -= Time.deltaTime;
 
         if (timer < 0)
@@ -150,14 +146,11 @@ public class AIController : MonoBehaviour
             lastHP = health.storedHealth;
 
             actions.Find(obj => obj.ActionID == "Heal").Probability
-                //= (health.initialHealth - health.storedHealth + 1) / health.initialHealth;
                 = ((float)health.initialHealth / (health.storedHealth + 1) - 1.0f);
 
                 actions.Find(obj => obj.ActionID == "EnterMirror").Probability
-                //= (health.initialHealth - health.storedHealth + 1) / health.initialHealth;
 
                 = ((float)health.initialHealth / (health.storedHealth + 1) - 1.0f);
-
         }
 
         if (rewardInViewport == null)
@@ -272,7 +265,6 @@ public class AIController : MonoBehaviour
             }
         }
 
-        //currentAction = actions[Random.Range(0, actions.ToList().Count - 1)];
         currentAction = SectorChoose();
     }
 

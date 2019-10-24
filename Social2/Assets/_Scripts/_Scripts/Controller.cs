@@ -5,7 +5,6 @@ using UnityEngine;
 public class Controller : MonoBehaviour
 {
 
-
     [SerializeField]
     private string enemy;
     [SerializeField]
@@ -49,9 +48,9 @@ public class Controller : MonoBehaviour
         float timeToWait = otherAnimator.GetCurrentAnimatorStateInfo(animLayer).length;
 
         other.enabled = false;
+
         //Against double hit
         StartCoroutine(LateCall(other, timeToWait));
-
     }
 
     IEnumerator LateCall(Collider other, float timeToWait)
@@ -74,13 +73,11 @@ public class Controller : MonoBehaviour
     void Update()
     {
 
-
         anim.SetFloat("Turn", inputH);
         anim.SetFloat("Forward", inputV);
 
         if (Input.GetKeyDown(KeyCode.X))
         {
-
             KnightHeal();
         }
 
@@ -94,7 +91,6 @@ public class Controller : MonoBehaviour
             GetComponent<PickingUpController>().sword.activeInHierarchy)
             {
                 KnightAttack();
-
             }
         }
 
@@ -128,12 +124,9 @@ public class Controller : MonoBehaviour
                 situationController.currentSituation = SituationController.Situation.AttackingEnemy;
                 FindClosestEnemy().GetComponent<Health>().DecreaseHealth();
                 Logger.LogAction("Attacked", gameObject, FindClosestEnemy());
-
             }
 
             anim.Play("Slash" + n);
-
-            
         }
 
     }
